@@ -10,7 +10,7 @@ class HomeRepo
     {
       var dio = Dio();
       var response = await dio.get(
-     'https://newsapi.org/v2/top-headlines?q=we&apiKey=836086f05b344448a16dd41ee51c6320&category=$searchQuery&country=us&pageSize=2&page=1'
+     'https://newsapi.org/v2/top-headlines?q=a&apiKey=836086f05b344448a16dd41ee51c6320&category=$searchQuery&country=us&pageSize=2&page=1'
       );
 
       HeadlinesModel model = HeadlinesModel.fromJson(response.data as Map<String, dynamic>);

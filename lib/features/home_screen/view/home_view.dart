@@ -57,18 +57,18 @@ class HomeView extends StatelessWidget {
                         controller: cubit.pageController,
                         children: [
                           CustomStackHome(
-                            imageUrl: cubit.technologyModel!.articles![0].urlToImage!,
+                            imageUrl: cubit.technologyModel!.articles![0].urlToImage??"https://lightwidget.com/wp-content/uploads/localhost-file-not-found.jpg",
                             title: cubit.technologyModel!.articles![0].title!,
                             author: cubit.technologyModel!.articles![0].author ?? "Unknown",
                           ),
                           CustomStackHome(
-                            imageUrl: cubit.sportsModel!.articles![0].urlToImage!,
+                            imageUrl: cubit.sportsModel!.articles![0].urlToImage??"https://lightwidget.com/wp-content/uploads/localhost-file-not-found.jpg",
                             title: cubit.sportsModel!.articles![0].title!,
                             author: cubit.sportsModel!.articles![0].author ?? "Unknown",
                           ),
 
                           CustomStackHome(
-                            imageUrl: cubit.businessModel!.articles![0].urlToImage!,
+                            imageUrl: cubit.businessModel!.articles![0].urlToImage??"https://lightwidget.com/wp-content/uploads/localhost-file-not-found.jpg",
                             title: cubit.businessModel!.articles![0].title!,
                             author: cubit.businessModel!.articles![0].author ?? "Unknown",
                           ),

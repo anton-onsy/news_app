@@ -11,24 +11,17 @@ import 'package:newsapp/features/explore_screen/cubit/news_cubit.dart';
 import 'package:newsapp/features/explore_screen/cubit/news_state.dart';
 import 'package:newsapp/features/explore_screen/view/popup_view.dart';
 import 'package:newsapp/features/explore_screen/view/widgets/label_type.dart';
-import 'package:newsapp/features/explore_screen/view/widgets/search_widget.dart';
-import 'package:newsapp/features/home_screen/view/home_view.dart';
 
 class ExploredView extends StatelessWidget {
   const ExploredView({super.key, required this.index});
   final int index;
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => NewsCubit()..getNews(),
       child: Scaffold(
         appBar: AppBar(
-          leading: IconButton(
-            onPressed: () {
-              Goto(context, HomeView(index: 0));
-            },
-            icon: Icon(Icons.arrow_back, color: Colors.black),
-          ),
           backgroundColor: Appcolors.profile_color,
           title: Text(
             "Explore",
@@ -41,39 +34,27 @@ class ExploredView extends StatelessWidget {
           actions: [
             IconButton(
               icon: Icon(Icons.search),
-               onPressed: ()
-                {
-                 Goto(context, SearchWidget());
-                },
+              onPressed: () {
+                Goto(context, FilterPopup());
+              },
             ),
           ],
         ),
         body: BlocBuilder<NewsCubit, NewsState>(
           builder: (context, state) {
             if (state is NewsLoading) {
-              return  Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                  CircularProgressIndicator(
-                    color: Appcolors.button_background_color,
-                  )
-                ]),
-              );
+              return const Center(child: CircularProgressIndicator());
             } else if (state is NewsSuccess) {
               if (state.model.articles?.isEmpty ?? true) {
                 return const Center(child: Text('No Data'));
               }
               return RefreshIndicator(
-                color: Appcolors.button_background_color,
-                backgroundColor: Appcolors.white_color,
                 onRefresh: () async {
                   context.read<NewsCubit>().getNews();
                 },
                 child: ListView(
                   children: [
                     SizedBox(height: 16.h),
-
                     SizedBox(
                       width: 430.w,
                       height: 34.h,
@@ -89,19 +70,24 @@ class ExploredView extends StatelessWidget {
                         ),
                       ),
                     ),
-
                     SizedBox(height: 24.h),
-
                     GestureDetector(
                       onTap: () {
-                        Goto(context, ArticleView(
-                          image: state.model.articles![0].urlToImage ?? '',
-                          title: state.model.articles![0].title ?? '',
-                          author: state.model.articles![0].author ?? '',
-                          publishedAt: state.model.articles![0].publishedAt ?? '',
-                          content: state.model.articles![0].content ?? '',
-                          onPressed: () => Goto(context, ExploredView(index: 1))
-                        ));
+                        Goto(
+                          context,
+                          ArticleView(
+                            title: state.model.articles![0].title ?? '',
+                            author: state.model.articles![0].author ?? '',
+                            image: state.model.articles![0].urlToImage ??
+                                'https://lightwidget.com/wp-content/uploads/localhost-file-not-found.jpg',
+                            publishedAt:
+                                state.model.articles![0].publishedAt ?? '',
+                            content: state.model.articles![0].content ?? '',
+                            onPressed: () {
+                              Goto(context, ExploredView(index: 1));
+                            },
+                          ),
+                        );
                       },
                       child: Container(
                         width: 366.w,
@@ -114,20 +100,27 @@ class ExploredView extends StatelessWidget {
                               height: 206.h,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
-                                image: state.model.articles![0].urlToImage != null &&
-                                        state.model.articles![0].urlToImage!.isNotEmpty
+                                image: state.model.articles![0].urlToImage !=
+                                            null &&
+                                        state.model.articles![0].urlToImage!
+                                            .isNotEmpty
                                     ? DecorationImage(
-                                        image: NetworkImage(
-                                            state.model.articles![0].urlToImage!),
+                                        image: NetworkImage(state
+                                            .model.articles![0].urlToImage!),
                                         fit: BoxFit.cover,
                                       )
                                     : null,
                               ),
-                              child: (state.model.articles![0].urlToImage == null ||
-                                      state.model.articles![0].urlToImage!.isEmpty)
+                              child: (state.model.articles![0].urlToImage ==
+                                          null ||
+                                      state.model.articles![0].urlToImage!
+                                          .isEmpty)
                                   ? const Center(
-                                      child: Icon(Icons.image_not_supported,
-                                          size: 50, color: Colors.grey),
+                                      child: Icon(
+                                        Icons.image_not_supported,
+                                        size: 50,
+                                        color: Colors.grey,
+                                      ),
                                     )
                                   : null,
                             ),
@@ -178,40 +171,38 @@ class ExploredView extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Builder(
-                      builder: (context) {
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: state.model.articles!.length - 1,
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              child: CustomCardExplored(
-                                Auth_image: Appassets.profile_image,
-                                title: state.model.articles![index + 1].title ?? '',
-                                Auth_date:
-                                    state.model.articles![index + 1].publishedAt ?? '',
-                                Auther: state.model.articles![index + 1].author ??
-                                    'Unknown',
-                                image:
-                                    state.model.articles![index + 1].urlToImage ?? '',
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: state.model.articles!.length - 1,
+                      itemBuilder: (context, index) {
+                        final article = state.model.articles![index + 1];
+                        return GestureDetector(
+                          onTap: () {
+                            Goto(
+                              context,
+                              ArticleView(
+                                title: article.title ?? '',
+                                author: article.author ?? 'Unknown',
+                                publishedAt: article.publishedAt ?? '',
+                                content: article.content ?? '',
+                                image: article.urlToImage ??
+                                    'https://lightwidget.com/wp-content/uploads/localhost-file-not-found.jpg',
+                                onPressed: () {
+                                  Goto(context, ExploredView(index: 1));
+                                },
                               ),
-                               onTap: () {
-                              Goto(context, ArticleView(
-                              image: state.model.articles![index].urlToImage ?? '',
-                              title: state.model.articles![index].title ?? '',
-                              author: state.model.articles![index].author ?? '',
-                              publishedAt: state.model.articles![index].publishedAt ?? '',
-                              content: state.model.articles![index].content ?? '',
-                              onPressed: () {
-                                Goto(context, ExploredView(index: 1));
-                              },
-                            ));
-                          },
                             );
                           },
+                          child: CustomCardExplored(
+                            Auth_image: Appassets.profile_image,
+                            title: article.title ?? '',
+                            Auth_date: article.publishedAt ?? '',
+                            Auther: article.author ?? 'Unknown',
+                            image: article.urlToImage ?? '',
+                          ),
                         );
-                      }
+                      },
                     ),
                   ],
                 ),
@@ -227,6 +218,8 @@ class ExploredView extends StatelessWidget {
     );
   }
 }
+
+
 
 
 // import 'package:flutter/material.dart';

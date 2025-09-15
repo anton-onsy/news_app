@@ -18,7 +18,7 @@ class ArticleView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ArticleCubit()..savedstate(),
+      create: (context) => ArticleCubit(),
       child: Scaffold(
         body: SizedBox(
             width: double.infinity,
